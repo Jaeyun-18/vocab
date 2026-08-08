@@ -1,0 +1,2 @@
+export const RECENT_WORDS_TEST_COUNT = 20;
+export const HIGH_WRONG_RATE_TEST_COUNT = 20;

@@ -47,3 +47,35 @@ export async function exportWordToNotion(word: Word, databaseId: string): Promis
   });
   return page.id as string;
 }
+
+export type ImportedWord = Omit<Word, "id"> & { notionPageId: string };
+
+function notionPageToWord(page: any): ImportedWord {
+  const props = page.properties;
+  return {
+    notionPageId: page.id,
+    english: props.English?.title?.[0]?.plain_text ?? "",
+    korean: props.Korean?.rich_text?.[0]?.plain_text ?? "",
+    wrongCount: props.WrongCount?.number ?? 0,
+    correctCount: props.CorrectCount?.number ?? 0,
+    lastCorrectAt: props.LastCorrectAt?.date?.start ?? null,
+    createdAt: props.CreatedAt?.date?.start ?? new Date().toISOString(),
+  };
+}
+
+// Fetches every page in the database, following pagination.
+export async function fetchAllWordsFromNotion(databaseId: string): Promise<ImportedWord[]> {
+  const words: ImportedWord[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const res = await notionFetch(`/v1/databases/${databaseId}/query`, {
+      method: "POST",
+      body: JSON.stringify({ page_size: 100, ...(cursor ? { start_cursor: cursor } : {}) }),
+    });
+    words.push(...res.results.map(notionPageToWord));
+    cursor = res.has_more ? res.next_cursor : undefined;
+  } while (cursor);
+
+  return words;
+}

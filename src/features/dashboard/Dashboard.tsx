@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Word } from "../../types/word";
 import { getAllWords } from "../../db/wordsRepo";
-import { selectHighWrongRateWords, selectRecentWords } from "../../utils/selectors";
 import { NotionExportButton } from "../notion/NotionExportButton";
+import { NotionImportButton } from "../notion/NotionImportButton";
 
 export function Dashboard() {
   const [words, setWords] = useState<Word[]>([]);
@@ -12,8 +12,9 @@ export function Dashboard() {
     getAllWords().then(setWords);
   }, []);
 
-  const recentPreview = selectRecentWords(words).slice(0, 5);
-  const highWrongRatePreview = selectHighWrongRateWords(words).slice(0, 5);
+  function refreshWords() {
+    getAllWords().then(setWords);
+  }
 
   return (
     <div>
@@ -29,35 +30,9 @@ export function Dashboard() {
         <Link to="/test/setup" className="button">
           테스트 시작
         </Link>
+        <NotionExportButton />
+        <NotionImportButton onImported={refreshWords} />
       </div>
-
-      <NotionExportButton />
-
-      <h3>최근 등록한 단어</h3>
-      {recentPreview.length === 0 ? (
-        <p>등록된 단어가 없습니다.</p>
-      ) : (
-        <ul>
-          {recentPreview.map((w) => (
-            <li key={w.id}>
-              {w.english} - {w.korean}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h3>오답률 높은 단어</h3>
-      {highWrongRatePreview.length === 0 ? (
-        <p>아직 테스트 기록이 없습니다.</p>
-      ) : (
-        <ul>
-          {highWrongRatePreview.map((w) => (
-            <li key={w.id}>
-              {w.english} - {w.korean} (오답 {w.wrongCount}회)
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

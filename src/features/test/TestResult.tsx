@@ -9,7 +9,9 @@ export function TestResult() {
     return (
       <div>
         <p>결과 정보가 없습니다.</p>
-        <Link to="/test/setup">테스트 설정으로 돌아가기</Link>
+        <Link to="/test/setup" className="button">
+          테스트 설정으로 돌아가기
+        </Link>
       </div>
     );
   }

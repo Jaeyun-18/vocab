@@ -83,8 +83,14 @@ export function WordList() {
               <td>{w.correctCount}</td>
               <td>{w.lastCorrectAt ? new Date(w.lastCorrectAt).toLocaleString() : "-"}</td>
               <td>
-                <Link to={`/words/${w.id}/edit`}>수정</Link>{" "}
-                <button onClick={() => handleDelete(w.id)}>삭제</button>
+                <div className="row-actions">
+                  <Link to={`/words/${w.id}/edit`} className="text-action">
+                    수정
+                  </Link>
+                  <button className="text-action" onClick={() => handleDelete(w.id)}>
+                    삭제
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

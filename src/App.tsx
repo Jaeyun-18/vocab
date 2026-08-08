@@ -14,8 +14,12 @@ export default function App() {
           단어장
         </Link>
         <nav>
-          <Link to="/words">단어 목록</Link>
-          <Link to="/test/setup">테스트</Link>
+          <Link to="/words" className="nav-link">
+            단어 목록
+          </Link>
+          <Link to="/test/setup" className="nav-link">
+            테스트
+          </Link>
         </nav>
       </header>
 

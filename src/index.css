@@ -4,104 +4,208 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: #1a1a1a;
-  background: #fafafa;
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  color: #37352f;
+  background: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .app-header {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
   background: #fff;
 }
 
 .app-title {
-  font-weight: 700;
-  text-decoration: none;
-  color: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .app-header nav {
   display: flex;
-  gap: 1rem;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: rgba(55, 53, 47, 0.65);
+}
+
+.nav-link:hover {
+  background: rgba(55, 53, 47, 0.08);
+  color: #37352f;
 }
 
 .app-main {
   max-width: 720px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin: 1rem 0;
   flex-wrap: wrap;
 }
 
 .button,
 button {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border: 1px solid #333;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  border-radius: 6px;
   background: #fff;
-  color: #1a1a1a;
-  text-decoration: none;
+  color: #37352f;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.1s ease-in;
+}
+
+.button:hover,
+button:hover {
+  background: rgba(55, 53, 47, 0.06);
 }
 
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: #fff;
 }
 
-input,
+input:not([type="radio"]):not([type="checkbox"]),
 select {
   padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.95rem;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #37352f;
+  background: #fff;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(35, 131, 226, 0.35);
+  outline-offset: -1px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  border: 1px solid rgba(55, 53, 47, 0.09);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-th,
+th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(55, 53, 47, 0.65);
+  background: rgba(55, 53, 47, 0.03);
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
 td {
   text-align: left;
-  padding: 0.5rem;
-  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+tbody tr:hover {
+  background: rgba(55, 53, 47, 0.03);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.text-action {
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: rgba(55, 53, 47, 0.65);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.text-action:hover {
+  background: rgba(55, 53, 47, 0.08);
+  color: #37352f;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
   max-width: 420px;
 }
 
-.form label {
+.form h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.form > label {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: rgba(55, 53, 47, 0.65);
+}
+
+.form button {
+  align-self: flex-start;
 }
 
 fieldset {
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid rgba(55, 53, 47, 0.09);
+  border-radius: 6px;
+  padding: 0.5rem 0.85rem 0.85rem;
+}
+
+legend {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(55, 53, 47, 0.65);
+  padding: 0 0.25rem;
 }
 
 fieldset label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: normal;
-  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.35rem;
+  border-radius: 4px;
+}
+
+fieldset label:hover {
+  background: rgba(55, 53, 47, 0.05);
 }

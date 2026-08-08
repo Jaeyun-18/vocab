@@ -6,19 +6,31 @@ import { selectHighWrongRateWords, selectRecentWords, shuffle } from "../../util
 import { isCorrectAnswer } from "../../utils/grading";
 import type { TestDirection, TestMode, TestResultItem } from "./testTypes";
 
-function buildQuestionSet(words: Word[], mode: TestMode): Word[] {
-  if (mode === "recent") return selectRecentWords(words);
-  if (mode === "highWrongRate") return selectHighWrongRateWords(words);
-  return shuffle(words);
+interface Question {
+  word: Word;
+  direction: TestDirection;
+}
+
+function randomDirection(): TestDirection {
+  return Math.random() < 0.5 ? "enToKr" : "krToEn";
+}
+
+function buildQuestionSet(words: Word[], mode: TestMode): Question[] {
+  const selected =
+    mode === "recent"
+      ? selectRecentWords(words)
+      : mode === "highWrongRate"
+        ? selectHighWrongRateWords(words)
+        : shuffle(words);
+  return selected.map((word) => ({ word, direction: randomDirection() }));
 }
 
 export function TestSession() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mode = (searchParams.get("mode") as TestMode) ?? "recent";
-  const direction = (searchParams.get("direction") as TestDirection) ?? "enToKr";
 
-  const [questions, setQuestions] = useState<Word[] | null>(null);
+  const [questions, setQuestions] = useState<Question[] | null>(null);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
   const [results, setResults] = useState<TestResultItem[]>([]);
@@ -33,28 +45,40 @@ export function TestSession() {
     return (
       <div>
         <p>이 조건에 해당하는 단어가 없습니다.</p>
-        <Link to="/test/setup">테스트 설정으로 돌아가기</Link>
+        <Link to="/test/setup" className="button">
+          테스트 설정으로 돌아가기
+        </Link>
       </div>
     );
   }
 
   const total = questions.length;
-  const current = questions[index];
-  const question = direction === "enToKr" ? current.english : current.korean;
-  const correctAnswer = direction === "enToKr" ? current.korean : current.english;
+  const { word: currentWord, direction } = questions[index];
+  const question = direction === "enToKr" ? currentWord.english : currentWord.korean;
+  const correctAnswer = direction === "enToKr" ? currentWord.korean : currentWord.english;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const correct = isCorrectAnswer(input, correctAnswer);
 
     const updated: Word = correct
-      ? { ...current, correctCount: current.correctCount + 1, lastCorrectAt: new Date().toISOString() }
-      : { ...current, wrongCount: current.wrongCount + 1 };
+      ? {
+          ...currentWord,
+          correctCount: currentWord.correctCount + 1,
+          lastCorrectAt: new Date().toISOString(),
+        }
+      : { ...currentWord, wrongCount: currentWord.wrongCount + 1 };
     await updateWord(updated);
 
     const nextResults = [
       ...results,
-      { english: current.english, korean: current.korean, direction, userAnswer: input, correct },
+      {
+        english: currentWord.english,
+        korean: currentWord.korean,
+        direction,
+        userAnswer: input,
+        correct,
+      },
     ];
 
     setInput("");

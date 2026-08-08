@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { TestDirection, TestMode } from "./testTypes";
+import type { TestMode } from "./testTypes";
 
 export function TestSetup() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<TestMode>("recent");
-  const [direction, setDirection] = useState<TestDirection>("enToKr");
 
   function handleStart() {
-    navigate(`/test/session?mode=${mode}&direction=${direction}`);
+    navigate(`/test/session?mode=${mode}`);
   }
 
   return (
@@ -43,28 +42,6 @@ export function TestSetup() {
             onChange={() => setMode("all")}
           />
           전체 단어
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>출제 방향</legend>
-        <label>
-          <input
-            type="radio"
-            name="direction"
-            checked={direction === "enToKr"}
-            onChange={() => setDirection("enToKr")}
-          />
-          영어 → 한글
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="direction"
-            checked={direction === "krToEn"}
-            onChange={() => setDirection("krToEn")}
-          />
-          한글 → 영어
         </label>
       </fieldset>
 

@@ -73,6 +73,7 @@ export function TestSession() {
     const nextResults = [
       ...results,
       {
+        wordId: currentWord.id,
         english: currentWord.english,
         korean: currentWord.korean,
         direction,

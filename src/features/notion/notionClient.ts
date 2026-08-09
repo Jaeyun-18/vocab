@@ -2,6 +2,17 @@ import type { Word } from "../../types/word";
 
 const NOTION_VERSION = "2022-06-28";
 
+class NotionApiError extends Error {
+  status: number;
+  body: string;
+
+  constructor(status: number, body: string) {
+    super(`Notion API error (${status}): ${body}`);
+    this.status = status;
+    this.body = body;
+  }
+}
+
 async function notionFetch(path: string, init?: RequestInit) {
   const res = await fetch(`/api/notion${path}`, {
     ...init,
@@ -12,9 +23,15 @@ async function notionFetch(path: string, init?: RequestInit) {
     },
   });
   if (!res.ok) {
-    throw new Error(`Notion API error (${res.status}): ${await res.text()}`);
+    throw new NotionApiError(res.status, await res.text());
   }
   return res.json();
+}
+
+// True if the page can no longer be edited because it (or an ancestor) was
+// deleted in Notion, which archives the block instead of removing it.
+function isArchivedPageError(error: unknown): boolean {
+  return error instanceof NotionApiError && /archived/i.test(error.body);
 }
 
 function wordToNotionProperties(word: Word) {
@@ -34,11 +51,17 @@ export async function exportWordToNotion(word: Word, databaseId: string): Promis
   const properties = wordToNotionProperties(word);
 
   if (word.notionPageId) {
-    await notionFetch(`/v1/pages/${word.notionPageId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ properties }),
-    });
-    return word.notionPageId;
+    try {
+      await notionFetch(`/v1/pages/${word.notionPageId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ properties }),
+      });
+      return word.notionPageId;
+    } catch (error) {
+      // The page was deleted in Notion (archived, not removed) since the last
+      // export. Recreate it as a new page rather than failing the whole export.
+      if (!isArchivedPageError(error)) throw error;
+    }
   }
 
   const page = await notionFetch("/v1/pages", {

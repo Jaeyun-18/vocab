@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { TestResultItem } from "./testTypes";
+import { getWord, updateWord } from "../../db/wordsRepo";
 
 export function TestResult() {
   const location = useLocation();
-  const results = (location.state as { results?: TestResultItem[] } | null)?.results;
+  const initialResults = (location.state as { results?: TestResultItem[] } | null)?.results;
+  const [results, setResults] = useState(initialResults);
 
   if (!results) {
     return (
@@ -18,6 +21,21 @@ export function TestResult() {
 
   const correctCount = results.filter((r) => r.correct).length;
   const wrongResults = results.filter((r) => !r.correct);
+
+  // The grading may have been too strict (e.g. a valid synonym). Undo the
+  // wrong mark on the underlying word and move it out of the wrong list.
+  async function handleMarkCorrect(item: TestResultItem) {
+    const word = await getWord(item.wordId);
+    if (word) {
+      await updateWord({
+        ...word,
+        wrongCount: Math.max(0, word.wrongCount - 1),
+        correctCount: word.correctCount + 1,
+        lastCorrectAt: new Date().toISOString(),
+      });
+    }
+    setResults((prev) => prev!.map((r) => (r === item ? { ...r, correct: true } : r)));
+  }
 
   return (
     <div>
@@ -34,6 +52,7 @@ export function TestResult() {
                 <th>English</th>
                 <th>한글</th>
                 <th>내 답</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -42,6 +61,11 @@ export function TestResult() {
                   <td>{r.english}</td>
                   <td>{r.korean}</td>
                   <td>{r.userAnswer || "(빈 답)"}</td>
+                  <td>
+                    <button type="button" onClick={() => handleMarkCorrect(r)}>
+                      삭제
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

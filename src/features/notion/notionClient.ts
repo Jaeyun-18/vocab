@@ -45,6 +45,21 @@ function wordToNotionProperties(word: Word) {
   };
 }
 
+// Every value wordToNotionProperties sends, in a fixed order. Two words with the
+// same fingerprint produce an identical Notion page, so an export can skip the
+// request entirely. Keep the field list in sync with wordToNotionProperties —
+// a field sent to Notion but missing here would stop triggering re-exports.
+export function syncFingerprint(word: Word): string {
+  return JSON.stringify([
+    word.english,
+    word.korean,
+    word.wrongCount,
+    word.correctCount,
+    word.lastCorrectAt,
+    word.createdAt,
+  ]);
+}
+
 // Creates the Notion page on first export, updates it on subsequent exports.
 // Returns the Notion page id so the caller can persist it on the local word.
 export async function exportWordToNotion(word: Word, databaseId: string): Promise<string> {

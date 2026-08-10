@@ -1,6 +1,7 @@
 import { useState } from "react";
+import type { Word } from "../../types/word";
 import { getAllWords, updateWord } from "../../db/wordsRepo";
-import { fetchAllWordsFromNotion } from "./notionClient";
+import { fetchAllWordsFromNotion, syncFingerprint } from "./notionClient";
 
 const DATABASE_ID = import.meta.env.VITE_NOTION_DATABASE_ID;
 
@@ -24,7 +25,10 @@ export function NotionImportButton({ onImported }: { onImported?: () => void }) 
       // or create a new one if this Notion page has never been synced before.
       for (const notionWord of notionWords) {
         const id = localIdByNotionPageId.get(notionWord.notionPageId) ?? crypto.randomUUID();
-        await updateWord({ id, ...notionWord });
+        // Just-imported values match Notion exactly, so record the fingerprint to
+        // keep the next export from sending them straight back unchanged.
+        const word: Word = { id, ...notionWord };
+        await updateWord({ ...word, lastSyncedFingerprint: syncFingerprint(word) });
       }
       setStatus("idle");
       onImported?.();
